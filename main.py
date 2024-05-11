@@ -1,44 +1,126 @@
 import random
 
-def lanzar_dados():
-    return random.randint(1, 6), random.randint(1, 6)
-
-def juan_juega():
-    puntaje = sum(lanzar_dados())
-    if puntaje == 0:
-        puntaje = max(sum(lanzar_dados()), puntaje)
-    elif puntaje <= 3:
-        puntaje = max(lanzar_dados()[1], puntaje)
-    return puntaje
-
-def maria_juega(puntaje_juan):
-    if puntaje_juan <= 3:
-        return max(lanzar_dados()), puntaje_juan
-    else:
-        return lanzar_dados()[0], puntaje_juan
-
 def simular_juego():
-    puntaje_juan = juan_juega()
-    puntaje_maria, puntaje_juan = maria_juega(puntaje_juan)
+    """
+    Simula una partida del juego de dados entre Juan y María.
+
+    Devuelve un valor que indica el ganador:
+    - 1 si Juan gana
+    - 2 si María gana
+    - 0 si hay empate
+    """
+
+    # Puntaje inicial de Juan y María
+    puntaje_juan = 0
+    puntaje_maria = 0
+
+    # Turno de Juan
+    puntaje_juan = tirar_dados_juan(puntaje_juan)
+
+    # Turno de María
+    puntaje_maria = tirar_dados_maria(puntaje_juan, puntaje_maria)
+
+    # Determinar el ganador
     if puntaje_juan > puntaje_maria:
-        return "Juan gana"
-    elif puntaje_juan < puntaje_maria:
-        return "María gana"
+        return 1  # Juan gana
+    elif puntaje_maria > puntaje_juan:
+        return 2  # María gana
     else:
-        return "Empate"
+        return 0  # Empate
+
+def tirar_dados_juan(puntaje_actual):
+    """
+    Simula el turno de Juan en el juego.
+
+    Argumentos:
+      puntaje_actual: El puntaje actual de Juan.
+
+    Devuelve el puntaje final de Juan.
+    """
+
+    # Lanzamiento inicial de dos dados
+    puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
+    puntaje_inicial = puntaje_tiro1 + puntaje_tiro2
+
+    # Segunda tirada si es necesario
+    if puntaje_inicial == 0:
+        puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
+        puntaje_final = puntaje_tiro1 + puntaje_tiro2
+    elif puntaje_inicial < 4:
+        if puntaje_tiro1 == 4 or puntaje_tiro2 == 4:
+            puntaje_tiro3 = random.randint(1, 6)
+            puntaje_final = puntaje_tiro3
+        else:
+            puntaje_final = puntaje_inicial
+    else:
+        puntaje_final = puntaje_inicial
+
+    return puntaje_actual + puntaje_final
+
+def tirar_dados_maria(puntaje_juan, puntaje_maria):
+    """
+    Simula el turno de María en el juego.
+
+    Argumentos:
+      puntaje_juan: El puntaje final de Juan.
+      puntaje_maria: El puntaje actual de María.
+
+    Devuelve el puntaje final de María.
+    """
+
+    # María conoce el puntaje de Juan y toma la mejor decisión
+    if puntaje_juan == 0:
+        puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
+        puntaje_final = puntaje_tiro1 + puntaje_tiro2
+    elif puntaje_juan < 4:
+        puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
+        if puntaje_tiro1 == 4 or puntaje_tiro2 == 4:
+            puntaje_tiro3 = random.randint(1, 6)
+            puntaje_final = puntaje_tiro3
+        else:
+            puntaje_final = puntaje_maria
+    else:
+        puntaje_final = puntaje_maria
+
+    return puntaje_maria + puntaje_final
 
 def simular_n_veces(n):
-    resultados = {"Juan gana": 0, "María gana": 0, "Empate": 0}
-    for _ in range(n):
-        resultado = simular_juego()
-        resultados[resultado] += 1
-    return resultados
+    """
+    Simula el juego n veces y calcula las frecuencias relativas de los resultados.
 
-# Simulación del juego 1000, 10000 y 100000 veces
-n_simulaciones = [1000, 10000, 100000]
-for n in n_simulaciones:
-    resultados = simular_n_veces(n)
-    print(f"Simulación de {n} juegos:")
-    for resultado, frecuencia in resultados.items():
-        print(f"{resultado}: {frecuencia / n:.4f}")
-    print()
+    Argumentos:
+      n: El número de veces que se simula el juego.
+    """
+  
+    victorias_juan = 0
+    victorias_maria = 0
+    empates = 0
+
+    for _ in range(n):
+        resultado_juego = simular_juego()
+        if resultado_juego == 1:
+            victorias_juan += 1
+        elif resultado_juego == 2:
+            victorias_maria += 1
+        else:
+            empates += 1
+
+    probabilidad_juan = victorias_juan / n
+    probabilidad_maria = victorias_maria / n
+    probabilidad_empate = empates / n
+
+    print(f"Simulaciones: {n}")
+    print(f"Victorias Juan: {victorias_juan}")
+    print(f"Victorias María: {victorias_maria}")
+    print(f"Empates: {empates}")
+    print(f"Probabilidad de victoria de Juan: {probabilidad_juan}")
+    print(f"Probabilidad de victoria de María: {probabilidad_maria}")
+    print(f"Probabilidad de empate: {probabilidad_empate}")
+
+#simulaciones
+print("\n1000 veces: \n")
+simular_n_veces(1000)
+print("\n10000 veces: \n")
+simular_n_veces(10000)
+print("\n100000 veces: \n")
+simular_n_veces(100000)
