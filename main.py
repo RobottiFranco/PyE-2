@@ -1,5 +1,25 @@
 import random
 
+# Constantes
+VICTORIA_JUAN = 1
+VICTORIA_MARIA = 2
+EMPATE = 0
+
+PUNTAJES = {
+    (4, 1): 1,
+    (1, 4): 1,
+    (4, 2): 2,
+    (2, 4): 2,
+    (4, 3): 3,
+    (3, 4): 3,
+    (4, 4): 4,
+    (4, 5): 5,
+    (5, 4): 5,
+    (4, 6): 6,
+    (6, 4): 6,
+}
+
+
 def simular_juego():
     """
     Simula una partida del juego de dados entre Juan y María.
@@ -10,79 +30,86 @@ def simular_juego():
     - 0 si hay empate
     """
 
-    # Puntaje inicial de Juan y María
-    puntaje_juan = 0
-    puntaje_maria = 0
-
     # Turno de Juan
-    puntaje_juan = tirar_dados_juan(puntaje_juan)
+    puntaje_juan = tirar_dados_juan()
 
     # Turno de María
-    puntaje_maria = tirar_dados_maria(puntaje_juan, puntaje_maria)
+    puntaje_maria = tirar_dados_maria(puntaje_juan)
 
     # Determinar el ganador
     if puntaje_juan > puntaje_maria:
-        return 1  # Juan gana
+        return VICTORIA_JUAN  # Juan gana
     elif puntaje_maria > puntaje_juan:
-        return 2  # María gana
+        return VICTORIA_MARIA  # María gana
     else:
-        return 0  # Empate
+        return EMPATE  # Empate
 
-def tirar_dados_juan(puntaje_actual):
+
+def tirar_dados_juan():
     """
     Simula el turno de Juan en el juego.
 
-    Argumentos:
-      puntaje_actual: El puntaje actual de Juan.
-
     Devuelve el puntaje final de Juan.
     """
+    # Lanza los dados
+    # Si el puntaje es 0, tira devuelta, esperando conseguir algun punto
+    # Si el puntaje es menor a 4, tira el dado que no es 4
+    # Si el puntaje es mayor o igual a 4, se planta
 
     # Lanzamiento inicial de dos dados
-    puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
-    puntaje_inicial = puntaje_tiro1 + puntaje_tiro2
+    dado1, dado2 = random.randint(1, 6), random.randint(1, 6)
+    puntaje = PUNTAJES.get((dado1, dado2), 0)
 
-    # Segunda tirada si es necesario
-    if puntaje_inicial == 0:
-        puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
-        puntaje_final = puntaje_tiro1 + puntaje_tiro2
-    elif puntaje_inicial < 4:
-        if puntaje_tiro1 == 4 or puntaje_tiro2 == 4:
-            puntaje_tiro3 = random.randint(1, 6)
-            puntaje_final = puntaje_tiro3
+    if puntaje == 0:
+        # Tira ambos dados nuevamente si el puntaje es 0
+        dado1, dado2 = random.randint(1, 6), random.randint(1, 6)
+        puntaje = PUNTAJES.get((dado1, dado2), 0)
+    elif puntaje < 4:
+        # Tira el dado que no es 4
+        if dado1 == 4:
+            dado2 = random.randint(1, 6)
         else:
-            puntaje_final = puntaje_inicial
-    else:
-        puntaje_final = puntaje_inicial
+            dado1 = random.randint(1, 6)
+        puntaje = PUNTAJES.get((dado1, dado2), 0)
 
-    return puntaje_actual + puntaje_final
+    return puntaje
 
-def tirar_dados_maria(puntaje_juan, puntaje_maria):
+
+def tirar_dados_maria(puntaje_juan):
     """
     Simula el turno de María en el juego.
 
     Argumentos:
       puntaje_juan: El puntaje final de Juan.
-      puntaje_maria: El puntaje actual de María.
 
     Devuelve el puntaje final de María.
     """
+    # Lanza los dados
+    # Si el puntaje es 0, tira devuelta, esperando conseguir algun punto
+    # Si el puntaje es mayor a 0:
+    #   Si el puntaje de juan es mayor, tira el dado que no sea 4
+    #   Si el puntaje de juan es menor o igual, se planta
+
+    # Lanzamiento inicial de dos dados
+    dado1, dado2 = random.randint(1, 6), random.randint(1, 6)
+    puntaje = PUNTAJES.get((dado1, dado2), 0)
 
     # María conoce el puntaje de Juan y toma la mejor decisión
-    if puntaje_juan == 0:
-        puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
-        puntaje_final = puntaje_tiro1 + puntaje_tiro2
-    elif puntaje_juan < 4:
-        puntaje_tiro1, puntaje_tiro2 = random.randint(1, 6), random.randint(1, 6)
-        if puntaje_tiro1 == 4 or puntaje_tiro2 == 4:
-            puntaje_tiro3 = random.randint(1, 6)
-            puntaje_final = puntaje_tiro3
-        else:
-            puntaje_final = puntaje_maria
+    if puntaje == 0:
+        # Tira nuevamente los dados esperando conseguir algun punto
+        dado1, dado2 = random.randint(1, 6), random.randint(1, 6)
+        puntaje = PUNTAJES.get((dado1, dado2), 0)
     else:
-        puntaje_final = puntaje_maria
+        if puntaje_juan > puntaje:
+            # Tira nuevamente el dado que no sea 4, con la esperanza de superar a Juan
+            if dado1 == 4:
+                dado2 = random.randint(1, 6)
+            else:
+                dado1 = random.randint(1, 6)
+            puntaje = PUNTAJES.get((dado1, dado2), 0)
 
-    return puntaje_maria + puntaje_final
+    return puntaje
+
 
 def simular_n_veces(n):
     """
@@ -91,36 +118,33 @@ def simular_n_veces(n):
     Argumentos:
       n: El número de veces que se simula el juego.
     """
-  
-    victorias_juan = 0
-    victorias_maria = 0
-    empates = 0
+    resultados = [0, 0, 0]
 
     for _ in range(n):
         resultado_juego = simular_juego()
-        if resultado_juego == 1:
-            victorias_juan += 1
-        elif resultado_juego == 2:
-            victorias_maria += 1
-        else:
-            empates += 1
+        resultados[resultado_juego] += 1
 
-    probabilidad_juan = victorias_juan / n
-    probabilidad_maria = victorias_maria / n
-    probabilidad_empate = empates / n
+    probabilidad_juan = resultados[VICTORIA_JUAN] / n
+    probabilidad_maria = resultados[VICTORIA_MARIA] / n
+    probabilidad_empate = resultados[EMPATE] / n
 
     print(f"Simulaciones: {n}")
-    print(f"Victorias Juan: {victorias_juan}")
-    print(f"Victorias María: {victorias_maria}")
-    print(f"Empates: {empates}")
+    print(f"Victorias Juan: {resultados[VICTORIA_JUAN]}")
+    print(f"Victorias María: {resultados[VICTORIA_MARIA]}")
+    print(f"Empates: {resultados[EMPATE]}")
     print(f"Probabilidad de victoria de Juan: {probabilidad_juan}")
     print(f"Probabilidad de victoria de María: {probabilidad_maria}")
     print(f"Probabilidad de empate: {probabilidad_empate}")
 
-#simulaciones
-print("\n1000 veces: \n")
-simular_n_veces(1000)
-print("\n10000 veces: \n")
-simular_n_veces(10000)
-print("\n100000 veces: \n")
-simular_n_veces(100000)
+
+# Solo ejecutar este codigo si el archivo se ejecuta directamente
+if __name__ == "__main__":
+    # simulaciones
+    print("\n1_000 veces: \n")
+    simular_n_veces(1_000)
+    print()
+    print("\n10_000 veces: \n")
+    simular_n_veces(10_000)
+    print()
+    print("\n100_000 veces: \n")
+    simular_n_veces(100_000)
