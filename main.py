@@ -128,7 +128,6 @@ def simular_n_veces(n):
     probabilidad_maria = resultados[VICTORIA_MARIA] / n
     probabilidad_empate = resultados[EMPATE] / n
 
-    print(f"Simulaciones: {n}")
     print(f"Victorias Juan: {resultados[VICTORIA_JUAN]}")
     print(f"Victorias María: {resultados[VICTORIA_MARIA]}")
     print(f"Empates: {resultados[EMPATE]}")
