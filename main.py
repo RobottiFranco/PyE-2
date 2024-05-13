@@ -5,6 +5,7 @@ VICTORIA_JUAN = 1
 VICTORIA_MARIA = 2
 EMPATE = 0
 
+# Tabla de combinaciones de dados y sus puntajes
 PUNTAJES = {
     (4, 1): 1,
     (1, 4): 1,
@@ -134,6 +135,13 @@ def simular_n_veces(n):
     print(f"Probabilidad de victoria de Juan: {probabilidad_juan}")
     print(f"Probabilidad de victoria de María: {probabilidad_maria}")
     print(f"Probabilidad de empate: {probabilidad_empate}")
+
+    return {
+        "VICTORIA_JUAN": resultados[VICTORIA_JUAN],
+        "VICTORIA_MARIA": resultados[VICTORIA_MARIA],
+        "EMPATE": resultados[EMPATE],
+    }
+
 
 
 # Solo ejecutar este codigo si el archivo se ejecuta directamente
